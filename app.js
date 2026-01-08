@@ -48,13 +48,16 @@ app.use(express.static(path.join(__dirname, "/public")));
 
 const store = MongoStore.create({
     mongoUrl: dbURL,
+    collectionName:"sessions",
+    tls:true,
+    autoRemove: "native",
     crypto: {
         secret: process.env.SECRET,
     },
     touchAfter: 24 * 3600,
 });
 
-store.on("error" , () => {
+store.on("error" , (err) => {
     console.log("Error in Mongo Session Store", err);
 });
 
@@ -62,7 +65,7 @@ const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // true
     cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
